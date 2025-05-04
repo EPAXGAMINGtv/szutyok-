@@ -13,11 +13,6 @@ if not exist limine (
 rem limine.h kopieren
 copy limine\limine.h kernel\src\limine.h >nul
 
-rem make in limine-Verzeichnis ausführen
-pushd limine
-make
-popd
-
 rem Anderes Skript aus kernel\get-deps.bat aufrufen
 call kernel\get-deps.bat
 

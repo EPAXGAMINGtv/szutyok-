@@ -5,7 +5,6 @@ set ARCH=riscv64
 
 rem In das kernel-Verzeichnis wechseln und build.bat ausführen
 pushd kernel
-set ARCH=%ARCH%
 call build.bat
 popd
 
