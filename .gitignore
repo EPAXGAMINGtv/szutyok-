@@ -44,3 +44,9 @@
 
 # Folders
 limine/*
+ovmf/*
+kernel/bin-*
+kernel/freestnd-c-Headers
+kernel/obj-*
+os.iso
+iso_root
