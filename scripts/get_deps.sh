@@ -1,11 +1,9 @@
 #!/bin/sh
 
 # Limine 
-if [ ! -d "limine" ]; then
-    git clone https://github.com/limine-bootloader/limine.git --branch=v8.x-binary --depth=1 --recurse-submodules
-    cp limine/limine.h kernel/src/limine.h
-    make -C limine
-fi
+git clone https://github.com/limine-bootloader/limine.git --branch=v8.x-binary --depth=1 --recurse-submodules
+cp limine/limine.h kernel/src/limine.h
+make -C limine
 
 sh kernel/get-deps.sh
 
