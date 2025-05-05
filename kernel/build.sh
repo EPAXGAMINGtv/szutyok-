@@ -1,5 +1,4 @@
 #!/bin/sh
-set -euo pipefail
 
 # Configuration
 export ARCH="riscv64"

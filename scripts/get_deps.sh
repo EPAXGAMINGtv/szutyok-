@@ -4,7 +4,9 @@ git clone https://github.com/limine-bootloader/limine.git --branch=v8.x-binary -
 cp limine/limine.h kernel/src/limine.h
 make -C limine
 
-sh kernel/get-deps.sh
+cd kernel
+sh get-deps.sh
+cd ..
 
 mkdir -p ovmf
 curl -Lo ovmf/ovmf-code-riscv64.fd https://github.com/osdev0/edk2-ovmf-nightly/releases/latest/download/ovmf-code-riscv64.fd
