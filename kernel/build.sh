@@ -1,9 +1,8 @@
-#!/bin/sh
+#!/usr/bin/bash
 
-# Configuration
 export ARCH="riscv64"
 OUTPUT="kernel"
-CC="clang"
+export CC=/usr/bin/clang
 CFLAGS="-g -O2 -pipe"
 CPPFLAGS=""
 LDFLAGS=""
@@ -12,13 +11,13 @@ OBJ_DIR="obj-${ARCH}"
 BIN_DIR="bin-${ARCH}"
 OUTPUT_BIN="${BIN_DIR}/${OUTPUT}"
 
-SUPPORTED_ARCHS=("aarch64" "loongarch64" "riscv64" "x86_64")
-[[ " ${SUPPORTED_ARCHS[*]} " =~ " ${ARCH} " ]] || {
+SUPPORTED_ARCHS="aarch64 loongarch64 riscv64 x86_64"
+if ! echo "$SUPPORTED_ARCHS" | grep -q "\b${ARCH}\b"; then
     echo "Architecture ${ARCH} not supported"
     exit 1
-}
+fi
 
-# Check dependencies
+
 if [[ "${1:-}" != "clean" && "${1:-}" != "distclean" ]]; then
     if [[ ! -d freestnd-c-hdrs || ! -d src/cc-runtime || ! -f src/limine.h ]]; then
         echo "Please run the ./get-deps script first"
@@ -26,23 +25,19 @@ if [[ "${1:-}" != "clean" && "${1:-}" != "distclean" ]]; then
     fi
 fi
 
-# Determine if using Clang
 if ${CC} --version 2>/dev/null | grep -q clang; then
     CC_IS_CLANG=1
 else
     CC_IS_CLANG=0
 fi
 
-# Add internal CFLAGS
 CFLAGS+=" -Wall -Wextra -std=gnu11 -nostdinc -ffreestanding"
 CFLAGS+=" -fno-stack-protector -fno-stack-check -fno-PIC"
 CFLAGS+=" -ffunction-sections -fdata-sections"
 
-# Add internal CPPFLAGS
 CPPFLAGS+=" -I src -isystem freestnd-c-hdrs"
 CPPFLAGS+=" -DLIMINE_API_REVISION=3"
 
-# Architecture-specific settings
 NASMFLAGS=""
 if [[ "${ARCH}" == "x86_64" ]]; then
     [[ "$CC_IS_CLANG" == "1" ]] && CC+=" -target x86_64-unknown-none"
@@ -71,7 +66,6 @@ fi
 LDFLAGS+=" -Wl,--build-id=none -nostdlib -static -z max-page-size=0x1000 -Wl,--gc-sections"
 LDFLAGS+=" -T linker-${ARCH}.ld"
 
-# Build source list
 SRCFILES=$(cd src && find -L . -type f | sort)
 CFILES=()
 ASFILES=()
@@ -87,7 +81,6 @@ done
 
 mkdir -p "$OBJ_DIR"
 
-# Compile .c files
 for file in "${CFILES[@]}"; do
     src="$SRC_DIR/${file}"
     obj="${OBJ_DIR}/${file%.c}.c.o"
@@ -96,7 +89,6 @@ for file in "${CFILES[@]}"; do
     $CC $CFLAGS $CPPFLAGS -c "$src" -o "$obj"
 done
 
-# Compile .S files
 for file in "${ASFILES[@]}"; do
     src="$SRC_DIR/${file}"
     obj="${OBJ_DIR}/${file%.S}.S.o"
@@ -105,7 +97,6 @@ for file in "${ASFILES[@]}"; do
     $CC $CFLAGS $CPPFLAGS -c "$src" -o "$obj"
 done
 
-# Compile .asm files with nasm (only on x86_64)
 if [[ "$ARCH" == "x86_64" ]]; then
     for file in "${NASMFILES[@]}"; do
         src="$SRC_DIR/${file}"
@@ -116,7 +107,6 @@ if [[ "$ARCH" == "x86_64" ]]; then
     done
 fi
 
-# Link
 mkdir -p "$BIN_DIR"
 echo "LD -> ${OUTPUT_BIN}"
 $CC $CFLAGS $LDFLAGS $(find "$OBJ_DIR" -name '*.o') -o "$OUTPUT_BIN"
