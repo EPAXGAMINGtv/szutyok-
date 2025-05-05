@@ -1,11 +1,6 @@
 #! /bin/sh
 
-set -ex
-
-srcdir="$(dirname "$0")"
-test -z "$srcdir" && srcdir=.
-
-cd "$srcdir"
+cd "src"
 
 clone_repo_commit() {
     if test -d "$2/.git"; then
