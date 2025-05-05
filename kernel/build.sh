@@ -2,6 +2,7 @@
 set -euo pipefail
 
 # Configuration
+export ARCH="riscv64"
 OUTPUT="kernel"
 CC="clang"
 CFLAGS="-g -O2 -pipe"
